@@ -20,7 +20,7 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        int temp = Utilities.getCityIdByLocation(this, (float) 93.5, (float) 42.8);
+        int temp = Utilities.getCityIdByLocation(this, 117.08, 36.19);
         LogUtil.d("MainActivity", "city_id= "+temp);
         /*
         String jsonData = load();

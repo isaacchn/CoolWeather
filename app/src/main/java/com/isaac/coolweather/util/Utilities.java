@@ -21,20 +21,18 @@ import java.net.URL;
 * Find all cities in db, then find the city that is most close to the given geo info.
 * */
 public class Utilities {
-    public static int getCityIdByLocation(Context context, float longitudeParam, float latitudeParam) {
+    public static int getCityIdByLocation(Context context, double longitudeParam, double latitudeParam) {
         CoolWeatherDBOpenHelper dbOpenHelper = new CoolWeatherDBOpenHelper(context, "CityInfo.db", null, 1);
         SQLiteDatabase db = dbOpenHelper.getReadableDatabase();
         Cursor resultCursor = db.rawQuery("SELECT * FROM city_info", null);
 
         /*Initialize one most close city to the given geo info*/
         int mostCloseCityId = 0;
-        float mostCloseDistance = 259200;
-        float mostCloseCityLongitude = 0;
-        float mostCloseCityLatitude = 0;
+        double mostCloseDistance = 259200;
         if (resultCursor.moveToFirst()) {
             int cityId;
-            float longitude;
-            float latitude;
+            double longitude;
+            double latitude;
             do {
                 cityId = resultCursor.getInt(resultCursor.getColumnIndex("city_id"));
                 longitude = resultCursor.getFloat(resultCursor.getColumnIndex("lon"));
@@ -42,7 +40,8 @@ public class Utilities {
                 /*Judge whether the chosen city is more close to the given geo info*/
                 if ((Math.pow((longitudeParam - longitude), 2) + Math.pow((latitudeParam - latitude), 2)) < mostCloseDistance) {
                     mostCloseCityId = cityId;
-                    mostCloseDistance = (float) (Math.pow((mostCloseCityLongitude - longitude), 2) + Math.pow((mostCloseCityLatitude - latitude), 2));
+                    mostCloseDistance = Math.pow((longitudeParam - longitude), 2) + Math.pow((latitudeParam - latitude), 2);
+                    LogUtil.d("Utilities", "Most close distance is " + mostCloseDistance);
                 }
             } while (resultCursor.moveToNext());
         }
