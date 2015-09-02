@@ -9,13 +9,13 @@ public class CityInfo {
     private int cityId;
     private String cityName;
     private String country;
-    private float cityLongitude;
-    private float cityLatitude;
+    private double cityLongitude;
+    private double cityLatitude;
 
     public CityInfo() {
     }
 
-    public CityInfo(int cityId, String cityName, String country, float cityLongitude, float cityLatitude) {
+    public CityInfo(int cityId, String cityName, String country, double cityLongitude, double cityLatitude) {
         this.cityId = cityId;
         this.cityName = cityName;
         this.country = country;
@@ -35,11 +35,11 @@ public class CityInfo {
         return country;
     }
 
-    public float getCityLongitude() {
+    public double getCityLongitude() {
         return cityLongitude;
     }
 
-    public float getCityLatitude() {
+    public double getCityLatitude() {
         return cityLatitude;
     }
 }
