@@ -65,7 +65,7 @@ public class MainActivity extends Activity implements OnClickListener {
         public void handleMessage(Message msg) {
             switch (msg.what) {
                 case CHANGE_CITY_INFO_TEXT:
-                    locationInfoText2.setText("The most close city id is " + Integer.toString((int) msg.obj));
+                    locationInfoText3.setText((String) msg.obj);
                     break;
                 default:
                     break;
@@ -116,23 +116,26 @@ public class MainActivity extends Activity implements OnClickListener {
             case R.id.get_weather_info:
                 //此处显示正在加载
                 getCityInfoByLocation(currentLongitude, currentLatitude);
-                //加载天气信息
-                switch (selectCityId) {
-                    case 0:
-                        //获取城市信息错误
-                    default:
-                        Utilities.sendHttpRequest(SERVER_URL + selectCityId, new HttpCallbackListener() {
-                            @Override
-                            public void onFinish(String response) {
-                                Message msg = new Message();
-                                msg.what = CHANGE_WEATHER_INFO;
-                            }
-
-                            @Override
-                            public void onError(Exception e) {
-                            }
-                        });
-                }
+//                //加载天气信息
+//                switch (selectCityId) {
+//                    case 0:
+//                        //获取城市信息错误
+//                        locationInfoText3.setText("0");
+//                    default:
+//                        Utilities.sendHttpRequest(SERVER_URL + selectCityId, new HttpCallbackListener() {
+//                            @Override
+//                            public void onFinish(String response) {
+//                                Message msg = new Message();
+//                                msg.what = CHANGE_WEATHER_INFO;
+//                                msg.obj=response;
+//                                handler.sendMessage(msg);
+//                            }
+//
+//                            @Override
+//                            public void onError(Exception e) {
+//                            }
+//                        });
+//                }
                 //正在加载结束
             default:
                 break;
@@ -140,19 +143,18 @@ public class MainActivity extends Activity implements OnClickListener {
     }
 
     private void getCityInfoByLocation(double longitude, double latitude) {
-        Utilities.getCityIdByLocation(this, longitude, latitude, new GetCityIdListener() {
+        Utilities.getCityIdByLocation(this, SERVER_URL, longitude, latitude, new GetCityIdListener() {
             @Override
-            public void onFinish(int cityId) {
+            public void onFinish(String cityId) {
                 Message msg = new Message();
                 msg.what = CHANGE_CITY_INFO_TEXT;
                 msg.obj = cityId;
-                selectCityId = cityId;
                 handler.sendMessage(msg);
             }
 
             @Override
-            public void onError() {
-                selectCityId = 0;
+            public void onError(Exception e) {
+                e.printStackTrace();
             }
         });
     }

@@ -84,7 +84,7 @@ public class Utilities {
         }).start();
     }
 
-    public static void getCityIdByLocation(final Context context, final double longitudeParam, final double latitudeParam, final GetCityIdListener listener) {
+    public static void getCityIdByLocation(final Context context, final String address, final double longitudeParam, final double latitudeParam, final GetCityIdListener listener) {
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -110,7 +110,33 @@ public class Utilities {
                     } while (resultCursor.moveToNext());
                 }
                 resultCursor.close();
-                listener.onFinish(mostCloseCityId);
+                //到目前为止已经获得了距离给定坐标最近的城市ID
+                HttpURLConnection connection = null;
+                try {
+                    URL url = new URL(address + mostCloseCityId);
+                    connection = (HttpURLConnection) url.openConnection();
+                    connection.setConnectTimeout(8000);
+                    connection.setReadTimeout(8000);
+                    connection.setDoInput(true);
+                    connection.setDoOutput(true);
+                    InputStream in = connection.getInputStream();
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+                    StringBuilder response = new StringBuilder();
+                    String line;
+                    while ((line = reader.readLine()) != null) {
+                        response.append(line);
+                    }
+                    if (listener != null) {
+                        listener.onFinish(response.toString());
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    listener.onError(e);
+                } finally {
+                    if (connection != null) {
+                        connection.disconnect();
+                    }
+                }
             }
         }).start();
     }
