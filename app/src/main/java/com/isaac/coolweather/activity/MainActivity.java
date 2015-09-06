@@ -6,6 +6,8 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -13,7 +15,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.isaac.coolweather.R;
-import com.isaac.coolweather.util.LogUtil;
+import com.isaac.coolweather.util.GetCityIdListener;
+import com.isaac.coolweather.util.HttpCallbackListener;
+import com.isaac.coolweather.util.Utilities;
 
 import java.util.List;
 
@@ -23,12 +27,20 @@ public class MainActivity extends Activity implements OnClickListener {
     private String provider;
     private double currentLongitude;
     private double currentLatitude;
+    private static final String SERVER_URL = "http://api.openweathermap.org/data/2.5/weather?id=";
+    private static int selectCityId = 0;
     TextView locationInfoText;
+    TextView locationInfoText2;
+    TextView locationInfoText3;
+
+    private static final int CHANGE_CITY_INFO_TEXT = 1;
+    private static final int CHANGE_WEATHER_INFO = 2;
+
     LocationListener locationListener = new LocationListener() {
         @Override
         public void onLocationChanged(Location location) {
-            currentLongitude=location.getLongitude();
-            currentLatitude=location.getLatitude();
+            currentLongitude = location.getLongitude();
+            currentLatitude = location.getLatitude();
             locationInfoText.setText("您所在地的坐标为：" + currentLongitude + "," + currentLatitude);
         }
 
@@ -48,6 +60,19 @@ public class MainActivity extends Activity implements OnClickListener {
         }
     };
 
+    private Handler handler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            switch (msg.what) {
+                case CHANGE_CITY_INFO_TEXT:
+                    locationInfoText2.setText("The most close city id is " + Integer.toString((int) msg.obj));
+                    break;
+                default:
+                    break;
+            }
+        }
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -55,6 +80,8 @@ public class MainActivity extends Activity implements OnClickListener {
         Button getWeatherInfo = (Button) findViewById(R.id.get_weather_info);
         getWeatherInfo.setOnClickListener(this);
         locationInfoText = (TextView) findViewById(R.id.location_info_text);
+        locationInfoText2 = (TextView) findViewById(R.id.location_info_text2);
+        locationInfoText3 = (TextView) findViewById(R.id.location_info_text3);
 
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         List<String> providerList = locationManager.getProviders(true);
@@ -70,17 +97,15 @@ public class MainActivity extends Activity implements OnClickListener {
         if (location != null) {
             currentLongitude = location.getLongitude();
             currentLatitude = location.getLatitude();
-                    }
-        locationInfoText.setText("您所在地的坐标为：" + currentLongitude + "," + currentLatitude);
-        locationManager.requestLocationUpdates(provider,5000,1,locationListener);
-        //int temp = Utilities.getCityIdByLocation(this, 117.08, 36.19);
-        //LogUtil.d("MainActivity", "city_id= " + temp);
+        }
+        locationInfoText.setText("您所在地的坐标为：\n" + currentLongitude + "," + currentLatitude);
+        locationManager.requestLocationUpdates(provider, 5000, 1, locationListener);
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if(locationManager!=null){
+        if (locationManager != null) {
             locationManager.removeUpdates(locationListener);
         }
     }
@@ -89,13 +114,46 @@ public class MainActivity extends Activity implements OnClickListener {
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.get_weather_info:
-                getWeatherInfoByLocation();
+                //此处显示正在加载
+                getCityInfoByLocation(currentLongitude, currentLatitude);
+                //加载天气信息
+                switch (selectCityId) {
+                    case 0:
+                        //获取城市信息错误
+                    default:
+                        Utilities.sendHttpRequest(SERVER_URL + selectCityId, new HttpCallbackListener() {
+                            @Override
+                            public void onFinish(String response) {
+                                Message msg = new Message();
+                                msg.what = CHANGE_WEATHER_INFO;
+                            }
+
+                            @Override
+                            public void onError(Exception e) {
+                            }
+                        });
+                }
+                //正在加载结束
             default:
                 break;
         }
     }
 
-    private void getWeatherInfoByLocation() {
+    private void getCityInfoByLocation(double longitude, double latitude) {
+        Utilities.getCityIdByLocation(this, longitude, latitude, new GetCityIdListener() {
+            @Override
+            public void onFinish(int cityId) {
+                Message msg = new Message();
+                msg.what = CHANGE_CITY_INFO_TEXT;
+                msg.obj = cityId;
+                selectCityId = cityId;
+                handler.sendMessage(msg);
+            }
 
+            @Override
+            public void onError() {
+                selectCityId = 0;
+            }
+        });
     }
 }

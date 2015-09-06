@@ -50,7 +50,7 @@ public class Utilities {
         return mostCloseCityId;
     }
 
-    public static void sendHttpRequest(final String address,final HttpCallbackListener listener) {
+    public static void sendHttpRequest(final String address, final HttpCallbackListener listener) {
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -69,7 +69,7 @@ public class Utilities {
                     while ((line = reader.readLine()) != null) {
                         response.append(line);
                     }
-                    if(listener!=null){
+                    if (listener != null) {
                         listener.onFinish(response.toString());
                     }
                 } catch (Exception e) {
@@ -83,4 +83,36 @@ public class Utilities {
             }
         }).start();
     }
+
+    public static void getCityIdByLocation(final Context context, final double longitudeParam, final double latitudeParam, final GetCityIdListener listener) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                CoolWeatherDBOpenHelper dbOpenHelper = new CoolWeatherDBOpenHelper(context, "CityInfo.db", null, 1);
+                SQLiteDatabase db = dbOpenHelper.getReadableDatabase();
+                Cursor resultCursor = db.rawQuery("SELECT * FROM city_info", null);
+                /*Initialize one most close city to the given geo info*/
+                int mostCloseCityId = 0;
+                double mostCloseDistance = 259200;
+                if (resultCursor.moveToFirst()) {
+                    int cityId;
+                    double longitude;
+                    double latitude;
+                    do {
+                        cityId = resultCursor.getInt(resultCursor.getColumnIndex("city_id"));
+                        longitude = resultCursor.getFloat(resultCursor.getColumnIndex("lon"));
+                        latitude = resultCursor.getFloat(resultCursor.getColumnIndex("lat"));
+                        /*Judge whether the chosen city is more close to the given geo info*/
+                        if ((Math.pow((longitudeParam - longitude), 2) + Math.pow((latitudeParam - latitude), 2)) < mostCloseDistance) {
+                            mostCloseCityId = cityId;
+                            mostCloseDistance = Math.pow((longitudeParam - longitude), 2) + Math.pow((latitudeParam - latitude), 2);
+                        }
+                    } while (resultCursor.moveToNext());
+                }
+                resultCursor.close();
+                listener.onFinish(mostCloseCityId);
+            }
+        }).start();
+    }
+
 }
