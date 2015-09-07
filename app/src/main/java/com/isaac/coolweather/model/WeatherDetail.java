@@ -117,6 +117,7 @@ public class WeatherDetail {
 
     public static class Coord {
         double lon;
+        double lat;
 
         public double getLat() {
             return lat;
@@ -134,7 +135,7 @@ public class WeatherDetail {
             this.lon = lon;
         }
 
-        double lat;
+
     }
 
     public static class Weather {
@@ -178,7 +179,7 @@ public class WeatherDetail {
 
     public static class Main {
         double temp;
-        int pressure;
+        double pressure;
         int humidity;
         double temp_min;
         double temp_max;
@@ -191,11 +192,11 @@ public class WeatherDetail {
             this.temp = temp;
         }
 
-        public int getPressure() {
+        public double getPressure() {
             return pressure;
         }
 
-        public void setPressure(int pressure) {
+        public void setPressure(double pressure) {
             this.pressure = pressure;
         }
 
@@ -226,7 +227,7 @@ public class WeatherDetail {
 
     public static class Wind {
         double speed;
-        int deg;
+        double deg;
 
         public double getSpeed() {
             return speed;
@@ -236,11 +237,11 @@ public class WeatherDetail {
             this.speed = speed;
         }
 
-        public int getDeg() {
+        public double getDeg() {
             return deg;
         }
 
-        public void setDeg(int deg) {
+        public void setDeg(double deg) {
             this.deg = deg;
         }
     }
