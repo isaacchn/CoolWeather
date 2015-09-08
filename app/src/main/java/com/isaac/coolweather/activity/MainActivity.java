@@ -153,7 +153,7 @@ public class MainActivity extends Activity implements OnClickListener {
     }
 
     private void getCityInfoByLocation(double longitude, double latitude) {
-        Utilities.getCityIdByLocation(this, SERVER_URL, longitude, latitude, new GetCityIdListener() {
+        Utilities.updateWeatherInfoByLocation2(this, SERVER_URL, longitude, latitude, new GetCityIdListener() {
             @Override
             public void onFinish(String cityId) {
                 Message msg = new Message();
