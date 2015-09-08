@@ -21,6 +21,7 @@ import java.net.URL;
 * Find all cities in db, then find the city that is most close to the given geo info.
 * */
 public class Utilities {
+    public static final double KELVIN_ZERO_DEGREE = 273.15;
     public static int getCityIdByLocation(Context context, double longitudeParam, double latitudeParam) {
         CoolWeatherDBOpenHelper dbOpenHelper = new CoolWeatherDBOpenHelper(context, "CityInfo.db", null, 1);
         SQLiteDatabase db = dbOpenHelper.getReadableDatabase();
@@ -114,6 +115,7 @@ public class Utilities {
                 HttpURLConnection connection = null;
                 try {
                     URL url = new URL(address + mostCloseCityId);
+                    LogUtil.d("Utilities", address + mostCloseCityId);
                     connection = (HttpURLConnection) url.openConnection();
                     connection.setConnectTimeout(8000);
                     connection.setReadTimeout(8000);

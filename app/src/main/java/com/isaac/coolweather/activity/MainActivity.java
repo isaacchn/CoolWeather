@@ -18,7 +18,6 @@ import com.google.gson.Gson;
 import com.isaac.coolweather.R;
 import com.isaac.coolweather.model.WeatherDetail;
 import com.isaac.coolweather.util.GetCityIdListener;
-import com.isaac.coolweather.util.HttpCallbackListener;
 import com.isaac.coolweather.util.LogUtil;
 import com.isaac.coolweather.util.Utilities;
 
@@ -31,7 +30,6 @@ public class MainActivity extends Activity implements OnClickListener {
     private double currentLongitude;
     private double currentLatitude;
     private static final String SERVER_URL = "http://api.openweathermap.org/data/2.5/weather?id=";
-    private static int selectCityId = 0;
     TextView locationInfoText;
     TextView locationInfoText2;
     TextView locationInfoText3;
@@ -68,15 +66,15 @@ public class MainActivity extends Activity implements OnClickListener {
         public void handleMessage(Message msg) {
             switch (msg.what) {
                 case CHANGE_CITY_INFO_TEXT:
-                    //locationInfoText3.setText((String) msg.obj);
-                    LogUtil.d("MainActivity",(String)msg.obj);
+                    LogUtil.d("MainActivity", (String) msg.obj);
                     Gson gson = new Gson();
-                    WeatherDetail weatherDetail = gson.fromJson((String)msg.obj,WeatherDetail.class);
+                    WeatherDetail weatherDetail = gson.fromJson((String) msg.obj, WeatherDetail.class);
                     StringBuilder builder = new StringBuilder();
-                    builder.append("City: "+weatherDetail.getName()+"\n");
-                    builder.append("Weather: "+weatherDetail.getWeather().get(0).getMain()+"\n");
-                    builder.append("Temp: "+weatherDetail.getMain().getTemp_min()+"/"+weatherDetail.getMain().getTemp_max()+" ℉\n");
-                    builder.append("Humidity: "+weatherDetail.getMain().getHumidity()+"\n");
+                    builder.append("City: " + weatherDetail.getName() + "\n");
+                    builder.append("Weather: " + weatherDetail.getWeather().get(0).getMain() + "\n");
+                    builder.append("Temp: " + Math.round(weatherDetail.getMain().getTemp_min() - Utilities.KELVIN_ZERO_DEGREE) + "/"
+                            + Math.round(weatherDetail.getMain().getTemp_max() - Utilities.KELVIN_ZERO_DEGREE) + " ℃\n");   //对温度四舍五入
+                    builder.append("Humidity: " + weatherDetail.getMain().getHumidity() + "\n");
                     locationInfoText3.setText(builder.toString());
                     break;
                 default:
