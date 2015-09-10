@@ -57,11 +57,18 @@
                 android:layout_height="match_parent"
                 android:layout_weight="2">
 
+                <ProgressBar
+                    android:id="@+id/weather_icon_progress"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center" />
+
                 <ImageView
                     android:id="@+id/weather_image"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:src="@drawable/test" />
+                    android:scaleType="fitCenter"
+                    android:layout_gravity="center" />
             </FrameLayout>
 
             <FrameLayout

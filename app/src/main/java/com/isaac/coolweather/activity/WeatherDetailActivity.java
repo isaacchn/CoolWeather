@@ -3,15 +3,21 @@ package com.isaac.coolweather.activity;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
 import android.location.Location;
 import android.location.LocationManager;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.util.Base64;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -22,6 +28,14 @@ import com.isaac.coolweather.util.LogUtil;
 import com.isaac.coolweather.util.UpdateUIListener;
 import com.isaac.coolweather.util.Utilities;
 
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.util.EntityUtils;
+
+import java.io.InputStream;
 import java.util.List;
 
 public class WeatherDetailActivity extends Activity implements OnClickListener {
@@ -33,15 +47,18 @@ public class WeatherDetailActivity extends Activity implements OnClickListener {
     TextView weatherMain;
     TextView weatherDetail;
     ProgressDialog progressDialog;
+    ProgressBar iconProgressBar;
 
     private final static int UPDATE_ON_CREATE = 1000;
     private final static int REFRESH_CURRENT_CITY = 1001;
     private static final String CURRENT_WEATHER_URL = "http://api.openweathermap.org/data/2.5/weather?id=";
+    private static final String WEATHER_ICON_URL = "http://openweathermap.org/img/w/";  //eg:http://openweathermap.org/img/w/09d.png
     //public static final double KELVIN_ZERO_DEGREE = 273.15;
 
     private LocationManager locationManager;
     private String locationProvider;
     private int currentCityId;
+    private String currentWeatherIcon;
 
     private Handler handler = new Handler() {
         @Override
@@ -65,10 +82,14 @@ public class WeatherDetailActivity extends Activity implements OnClickListener {
                     detailBuilder.append("Pressure: " + weatherDetailObj.getMain().getPressure() + "hPa\n");
                     detailBuilder.append("Wind Speed: " + weatherDetailObj.getWind().getSpeed() + "m/s\n");
                     weatherDetail.setText(detailBuilder.toString());
-                    //update currentCityId
+                    //update currentCityId & currentWeatherIcon
                     currentCityId = weatherDetailObj.getId();
+                    currentWeatherIcon=weatherDetailObj.getWeather().get(0).getIcon();
                     //dismiss progress dialog
                     progressDialog.dismiss();
+                    //update weather icon
+                    WeatherIconLoader weatherIconLoader=new WeatherIconLoader();
+                    weatherIconLoader.execute(WEATHER_ICON_URL, currentWeatherIcon, ".png");
                     break;
                 case REFRESH_CURRENT_CITY:
                     LogUtil.d("WeatherDetailActivity", "Refresh current city");
@@ -87,15 +108,69 @@ public class WeatherDetailActivity extends Activity implements OnClickListener {
                     detailBuilder2.append("Pressure: " + weatherDetail2.getMain().getPressure() + "hPa\n");
                     detailBuilder2.append("Wind Speed: " + weatherDetail2.getWind().getSpeed() + "m/s\n");
                     weatherDetail.setText(detailBuilder2.toString());
-                    //update currentCityId
+                    //update currentCityId & currentWeatherIcon
                     currentCityId = weatherDetail2.getId();
+                    currentWeatherIcon=weatherDetail2.getWeather().get(0).getIcon();
                     //dismiss progress dialog
                     progressDialog.dismiss();
+                    //update weather icon
+                    WeatherIconLoader weatherIconLoader2=new WeatherIconLoader();
+                    weatherIconLoader2.execute(WEATHER_ICON_URL,currentWeatherIcon,".png");
                 default:
                     break;
             }
         }
     };
+
+    //Load weather icon from server.
+    class WeatherIconLoader extends AsyncTask<String, Void, BitmapDrawable> {
+        @Override
+        protected void onPreExecute() {
+            iconProgressBar.setVisibility(View.VISIBLE);
+        }
+
+        /**
+         * @param strings
+         * @return null when error occurred.
+         */
+        @Override
+        protected BitmapDrawable doInBackground(String... strings) {
+            try {
+                HttpClient httpClient = new DefaultHttpClient();
+                LogUtil.d("WeatherIconLoader",strings[0]+strings[1]+strings[2]);
+                HttpGet httpGet = new HttpGet(strings[0]+strings[1]+strings[2]);
+                HttpResponse httpResponse = httpClient.execute(httpGet);
+                if (httpResponse.getStatusLine().getStatusCode() == 200) {
+                    HttpEntity entity = httpResponse.getEntity();
+//                    String response = EntityUtils.toString(entity, "UTF-8");
+//                    LogUtil.d("WeatherIconLoader",response);
+//                    byte[] img = Base64.decode(response.getBytes(), Base64.DEFAULT);
+//                    Bitmap bitmap;
+//                    if (img != null) {
+//                        bitmap = BitmapFactory.decodeByteArray(img, 0, img.length);
+//                        BitmapDrawable drawable = new BitmapDrawable(bitmap);
+//                        return drawable;
+//                    }
+                    InputStream inputStream = entity.getContent();
+                    Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
+                    return new BitmapDrawable(bitmap);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(BitmapDrawable bitmapDrawable) {
+            if (bitmapDrawable != null) {
+                iconProgressBar.setVisibility(View.GONE);
+                weatherImage.setImageDrawable(bitmapDrawable);
+            } else {
+                Toast.makeText(WeatherDetailActivity.this, "获取天气图标失败", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -108,6 +183,7 @@ public class WeatherDetailActivity extends Activity implements OnClickListener {
         weatherImage = (ImageView) findViewById(R.id.weather_image);
         weatherMain = (TextView) findViewById(R.id.weather_main);
         weatherDetail = (TextView) findViewById(R.id.weather_detail);
+        iconProgressBar = (ProgressBar) findViewById(R.id.weather_icon_progress);
 
         homeButton.setOnClickListener(this);
         refreshButton.setOnClickListener(this);
@@ -125,7 +201,7 @@ public class WeatherDetailActivity extends Activity implements OnClickListener {
          ******************************************************************************************/
         Location location = getLocation();
         updateUIOnCreate(location); //Update current city ID in handler.
-    }
+}
 
     @Override
     public void onClick(View view) {
