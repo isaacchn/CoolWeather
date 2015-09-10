@@ -22,6 +22,8 @@ import java.net.URL;
 * */
 public class Utilities {
     public static final double KELVIN_ZERO_DEGREE = 273.15;
+    private static final String CURRENT_WEATHER_BY_LOCATION_URL_PREFIX = "http://api.openweathermap.org/data/2.5/weather?";//http://api.openweathermap.org/data/2.5/weather?lat=35&lon=139
+
     public static int getCityIdByLocation(Context context, double longitudeParam, double latitudeParam) {
         CoolWeatherDBOpenHelper dbOpenHelper = new CoolWeatherDBOpenHelper(context, "CityInfo.db", null, 1);
         SQLiteDatabase db = dbOpenHelper.getReadableDatabase();
@@ -143,38 +145,47 @@ public class Utilities {
             }
         }).start();
     }
-    public static void updateWeatherInfoByLocation(final Context context, final String address, final double longitudeParam, final double latitudeParam, final UpdateUIListener listener) {
+
+    /**
+     * updateWeatherInfoByLocation
+     * @param context
+     * @param longitudeParam
+     * @param latitudeParam
+     * @param listener (callback, update UI)
+     */
+    public static void updateWeatherInfoByLocation(final Context context, final double longitudeParam, final double latitudeParam, final UpdateUIListener listener) {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                CoolWeatherDBOpenHelper dbOpenHelper = new CoolWeatherDBOpenHelper(context, "CityInfo.db", null, 1);
-                SQLiteDatabase db = dbOpenHelper.getReadableDatabase();
-                Cursor resultCursor = db.rawQuery("SELECT * FROM city_info", null);
-                /*Initialize one most close city to the given geo info*/
-                int mostCloseCityId = 0;
-                double mostCloseDistance = 259200;
-                if (resultCursor.moveToFirst()) {
-                    int cityId;
-                    double longitude;
-                    double latitude;
-                    do {
-                        cityId = resultCursor.getInt(resultCursor.getColumnIndex("city_id"));
-                        longitude = resultCursor.getFloat(resultCursor.getColumnIndex("lon"));
-                        latitude = resultCursor.getFloat(resultCursor.getColumnIndex("lat"));
-                        /*Judge whether the chosen city is more close to the given geo info*/
-                        if ((Math.pow((longitudeParam - longitude), 2) + Math.pow((latitudeParam - latitude), 2)) < mostCloseDistance) {
-                            mostCloseCityId = cityId;
-                            mostCloseDistance = Math.pow((longitudeParam - longitude), 2) + Math.pow((latitudeParam - latitude), 2);
-                        }
-                    } while (resultCursor.moveToNext());
-                }
-                resultCursor.close();
-                db.close();
+//                CoolWeatherDBOpenHelper dbOpenHelper = new CoolWeatherDBOpenHelper(context, "CityInfo.db", null, 1);
+//                SQLiteDatabase db = dbOpenHelper.getReadableDatabase();
+//                Cursor resultCursor = db.rawQuery("SELECT * FROM city_info", null);
+//                /*Initialize one most close city to the given geo info*/
+//                int mostCloseCityId = 0;
+//                double mostCloseDistance = 259200;
+//                if (resultCursor.moveToFirst()) {
+//                    int cityId;
+//                    double longitude;
+//                    double latitude;
+//                    do {
+//                        cityId = resultCursor.getInt(resultCursor.getColumnIndex("city_id"));
+//                        longitude = resultCursor.getFloat(resultCursor.getColumnIndex("lon"));
+//                        latitude = resultCursor.getFloat(resultCursor.getColumnIndex("lat"));
+//                        /*Judge whether the chosen city is more close to the given geo info*/
+//                        if ((Math.pow((longitudeParam - longitude), 2) + Math.pow((latitudeParam - latitude), 2)) < mostCloseDistance) {
+//                            mostCloseCityId = cityId;
+//                            mostCloseDistance = Math.pow((longitudeParam - longitude), 2) + Math.pow((latitudeParam - latitude), 2);
+//                        }
+//                    } while (resultCursor.moveToNext());
+//                }
+//                resultCursor.close();
+//                db.close();
                 //到目前为止已经获得了距离给定坐标最近的城市ID
                 HttpURLConnection connection = null;
                 try {
-                    URL url = new URL(address + mostCloseCityId);
-                    LogUtil.d("Utilities", address + mostCloseCityId);
+                    //eg: //http://api.openweathermap.org/data/2.5/weather?lat=35&lon=139
+                    URL url = new URL(CURRENT_WEATHER_BY_LOCATION_URL_PREFIX+"lat="+latitudeParam+"&lon="+longitudeParam);
+                    LogUtil.d("Utilities", url.toString());
                     connection = (HttpURLConnection) url.openConnection();
                     connection.setConnectTimeout(8000);
                     connection.setReadTimeout(8000);
@@ -198,7 +209,6 @@ public class Utilities {
                         connection.disconnect();
                     }
                 }
-                listener.onUpdateCurrentCityId(mostCloseCityId);
             }
         }).start();
     }

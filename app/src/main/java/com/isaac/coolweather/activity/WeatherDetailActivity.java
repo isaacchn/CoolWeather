@@ -35,7 +35,7 @@ public class WeatherDetailActivity extends Activity implements OnClickListener {
     private final static int UPDATE_ON_CREATE = 1000;
     private final static int REFRESH_CURRENT_CITY = 1001;
     private static final String CURRENT_WEATHER_URL = "http://api.openweathermap.org/data/2.5/weather?id=";
-    //public static final double KELVIN_ZERO_DEGREE = 273.15;
+       //public static final double KELVIN_ZERO_DEGREE = 273.15;
 
     private LocationManager locationManager;
     private String locationProvider;
@@ -56,7 +56,7 @@ public class WeatherDetailActivity extends Activity implements OnClickListener {
                     Gson gson2 = new Gson();
                     WeatherDetail weatherDetail2 = gson2.fromJson((String) msg.obj, WeatherDetail.class);
                     StringBuilder mainBuilder2 = new StringBuilder();
-                    mainBuilder2.append(weatherDetail2.getWeather().get(0).getMain()+"\n");
+                    mainBuilder2.append(weatherDetail2.getWeather().get(0).getMain() + "\n");
                     mainBuilder2.append(Math.round(weatherDetail2.getMain().getTemp_min() - Utilities.KELVIN_ZERO_DEGREE) + "/" //minus absolute zero degree
                             + Math.round(weatherDetail2.getMain().getTemp_max() - Utilities.KELVIN_ZERO_DEGREE) + " ℃\n");
                     weatherMain.setText(mainBuilder2.toString());
@@ -81,8 +81,12 @@ public class WeatherDetailActivity extends Activity implements OnClickListener {
         homeButton.setOnClickListener(this);
         refreshButton.setOnClickListener(this);
 
+        /************************************************************
+         1 Update UI.
+         2 Change current city id, so you can refresh current place weather info without geographic info.
+         ************************************************************/
         Location location = getLocation();
-        updateUIOnCreate(location);
+        updateUIOnCreate(location); //Update current city ID in handler.
     }
 
     @Override
@@ -121,7 +125,7 @@ public class WeatherDetailActivity extends Activity implements OnClickListener {
         double longitude = location.getLongitude();
         double latitude = location.getLatitude();
         LogUtil.d("WeatherDetailActivity", "Location: " + longitude + "," + latitude);
-        Utilities.updateWeatherInfoByLocation(this, CURRENT_WEATHER_URL, longitude, latitude, new UpdateUIListener() {
+        Utilities.updateWeatherInfoByLocation(this, longitude, latitude, new UpdateUIListener() {
             @Override
             public void onFinish(String weatherJson) {
                 Message message = new Message();
