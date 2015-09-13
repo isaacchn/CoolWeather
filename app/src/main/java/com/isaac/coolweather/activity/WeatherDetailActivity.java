@@ -3,6 +3,7 @@ package com.isaac.coolweather.activity;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
@@ -12,7 +13,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.util.Base64;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -33,7 +33,6 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.util.EntityUtils;
 
 import java.io.InputStream;
 import java.util.List;
@@ -142,15 +141,6 @@ public class WeatherDetailActivity extends Activity implements OnClickListener {
                 HttpResponse httpResponse = httpClient.execute(httpGet);
                 if (httpResponse.getStatusLine().getStatusCode() == 200) {
                     HttpEntity entity = httpResponse.getEntity();
-//                    String response = EntityUtils.toString(entity, "UTF-8");
-//                    LogUtil.d("WeatherIconLoader",response);
-//                    byte[] img = Base64.decode(response.getBytes(), Base64.DEFAULT);
-//                    Bitmap bitmap;
-//                    if (img != null) {
-//                        bitmap = BitmapFactory.decodeByteArray(img, 0, img.length);
-//                        BitmapDrawable drawable = new BitmapDrawable(bitmap);
-//                        return drawable;
-//                    }
                     InputStream inputStream = entity.getContent();
                     Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
                     return new BitmapDrawable(bitmap);
@@ -208,6 +198,11 @@ public class WeatherDetailActivity extends Activity implements OnClickListener {
         switch (view.getId()) {
             case R.id.refresh:
                 refreshUI(currentCityId);
+                break;
+            case R.id.home:
+                Intent intent = new Intent(WeatherDetailActivity.this,CitySelectionActivity.class);
+                startActivity(intent);
+                break;
             default:
                 break;
         }
