@@ -1,14 +1,14 @@
 package com.isaac.coolweather.activity;
 
+import android.app.Activity;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 
 import com.isaac.coolweather.R;
 
-public class CitySelectionActivity extends AppCompatActivity {
+public class CitySelectionActivity extends Activity {
     EditText inputCity;
     Button settings;
     ListView queriedCityList;

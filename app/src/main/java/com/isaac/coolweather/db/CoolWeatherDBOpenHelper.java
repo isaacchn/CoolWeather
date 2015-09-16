@@ -12,7 +12,7 @@ import android.database.sqlite.SQLiteOpenHelper;
  */
 public class CoolWeatherDBOpenHelper extends SQLiteOpenHelper {
     private static final String CREATE_CITY_INFO =
-            "create table if not exists city_info ("
+            "create table if not exists saved_city_detail ("
                     + "city_id integer primary key,"
                     + "city_name text,"
                     + "country text,"

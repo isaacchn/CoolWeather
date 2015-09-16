@@ -4,6 +4,8 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
@@ -23,6 +25,7 @@ import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.isaac.coolweather.R;
+import com.isaac.coolweather.db.CoolWeatherDBOpenHelper;
 import com.isaac.coolweather.model.WeatherDetail;
 import com.isaac.coolweather.util.LogUtil;
 import com.isaac.coolweather.util.UpdateUIListener;
@@ -198,6 +201,8 @@ public class WeatherDetailActivity extends Activity implements OnClickListener {
         switch (view.getId()) {
             case R.id.refresh:
                 refreshUI(currentCityId);
+                //tempWritePreferences();
+                //tempWriteDatabase();
                 break;
             case R.id.home:
                 Intent intent = new Intent(WeatherDetailActivity.this,CitySelectionActivity.class);
@@ -276,4 +281,20 @@ public class WeatherDetailActivity extends Activity implements OnClickListener {
         Location location = locationManager.getLastKnownLocation(locationProvider);
         return location;
     }
+
+//    private void tempWritePreferences(){
+//        SharedPreferences.Editor editor=getSharedPreferences("savedCityList",MODE_PRIVATE).edit();
+//        editor.putInt("cityId",12345);
+//        editor.putString("cityName","Utuobang");
+//        editor.putString("country","Earth");
+//        editor.putFloat("longitude",12.11f);
+//        editor.putFloat("latitude",11.12f);
+//        editor.apply();
+//    }
+//    private void tempWriteDatabase(){
+//        CoolWeatherDBOpenHelper openHelper = new CoolWeatherDBOpenHelper(this,"OpenWeather.db",null,1);
+//        SQLiteDatabase db = openHelper.getWritableDatabase();
+//        //db.execSQL("insert into saved_city_detail (city_id,city_name,country,lon,lat) values ('12345,'Sishui','CN','11.22','22.11');");
+//        //db.execSQL("insert into saved_city_detail (city_id,city_name,country,lon,lat) values ('12346,'Jining','CN','33.22','22.11');");
+//    }
 }

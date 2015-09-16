@@ -10,6 +10,14 @@ public class SavedCityDetail {
     private double longitude;
     private double latitude;
 
+    public SavedCityDetail(int cityId, String cityName, String country, double longitude, double latitude) {
+        this.cityId = cityId;
+        this.cityName = cityName;
+        this.country = country;
+        this.longitude = longitude;
+        this.latitude = latitude;
+    }
+
     public int getCityId() {
         return cityId;
     }
