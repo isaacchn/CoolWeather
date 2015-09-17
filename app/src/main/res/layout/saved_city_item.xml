@@ -7,16 +7,20 @@
         android:id="@+id/listItemCityName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:textSize="30sp"/>
+    <TextView
+        android:id="@+id/listItemSymbol"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:textSize="30sp"
-        android:text="Sishui"/>
-
+        android:layout_toRightOf="@id/listItemCityName"
+        android:text=","/>
     <TextView
         android:id="@+id/listItemCountry"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="30sp"
-        android:layout_toRightOf="@id/listItemCityName"
-        android:text=",CN"/>
+        android:layout_toRightOf="@id/listItemSymbol"/>
 
     <Button
         android:id="@+id/listItemDelete"
