@@ -3,7 +3,10 @@ package com.isaac.coolweather.activity;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -48,5 +51,13 @@ public class ChooseCityDialogActivity extends Activity {
         }
         NativeCityDetailAdapter adapter = new NativeCityDetailAdapter(this, R.layout.queried_city_item, queriedCityDetailList);
         queriedCityListView.setAdapter(adapter);
+        queriedCityListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+                NativeCityDetail clickedCityItem=queriedCityDetailList.get(position);
+                Toast.makeText(ChooseCityDialogActivity.this,"...",Toast.LENGTH_SHORT).show();
+                LogUtil.d("ChooseCityDialogActivity",clickedCityItem.getName());
+            }
+        });
     }
 }
