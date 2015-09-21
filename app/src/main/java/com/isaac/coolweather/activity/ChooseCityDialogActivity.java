@@ -54,9 +54,14 @@ public class ChooseCityDialogActivity extends Activity {
         queriedCityListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
-                NativeCityDetail clickedCityItem=queriedCityDetailList.get(position);
-                Toast.makeText(ChooseCityDialogActivity.this,"...",Toast.LENGTH_SHORT).show();
-                LogUtil.d("ChooseCityDialogActivity",clickedCityItem.getName());
+                NativeCityDetail clickedCityItem = queriedCityDetailList.get(position);
+                //Toast.makeText(ChooseCityDialogActivity.this, "...", Toast.LENGTH_SHORT).show();
+                //LogUtil.d("ChooseCityDialogActivity", clickedCityItem.getName());
+                Intent intent1 = new Intent(ChooseCityDialogActivity.this, WeatherDetailActivity.class);
+                Bundle bundle = new Bundle();
+                bundle.putInt("cityId", clickedCityItem.getId());
+                intent1.putExtras(bundle);
+                startActivity(intent1);
             }
         });
     }

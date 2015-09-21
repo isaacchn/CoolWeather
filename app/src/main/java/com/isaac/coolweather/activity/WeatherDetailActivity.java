@@ -4,8 +4,6 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
@@ -25,7 +23,6 @@ import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.isaac.coolweather.R;
-import com.isaac.coolweather.db.CoolWeatherDBOpenHelper;
 import com.isaac.coolweather.model.WeatherDetail;
 import com.isaac.coolweather.util.LogUtil;
 import com.isaac.coolweather.util.UpdateUIListener;
@@ -86,11 +83,11 @@ public class WeatherDetailActivity extends Activity implements OnClickListener {
                     weatherDetail.setText(detailBuilder.toString());
                     //update currentCityId & currentWeatherIcon
                     currentCityId = weatherDetailObj.getId();
-                    currentWeatherIcon=weatherDetailObj.getWeather().get(0).getIcon();
+                    currentWeatherIcon = weatherDetailObj.getWeather().get(0).getIcon();
                     //dismiss progress dialog
                     progressDialog.dismiss();
                     //update weather icon
-                    WeatherIconLoader weatherIconLoader=new WeatherIconLoader();
+                    WeatherIconLoader weatherIconLoader = new WeatherIconLoader();
                     weatherIconLoader.execute(WEATHER_ICON_URL, currentWeatherIcon, ".png");
                     break;
                 case REFRESH_CURRENT_CITY:
@@ -98,6 +95,8 @@ public class WeatherDetailActivity extends Activity implements OnClickListener {
                     LogUtil.d("WeatherDetailActivity", (String) msg.obj);
                     Gson gson2 = new Gson();
                     WeatherDetail weatherDetail2 = gson2.fromJson((String) msg.obj, WeatherDetail.class);
+                    //update title text view
+                    cityName.setText(weatherDetail2.getName() + "," + weatherDetail2.getSys().getCountry());
                     //refresh main weather text view
                     StringBuilder mainBuilder2 = new StringBuilder();
                     mainBuilder2.append(weatherDetail2.getWeather().get(0).getMain() + "\n");
@@ -112,12 +111,12 @@ public class WeatherDetailActivity extends Activity implements OnClickListener {
                     weatherDetail.setText(detailBuilder2.toString());
                     //update currentCityId & currentWeatherIcon
                     currentCityId = weatherDetail2.getId();
-                    currentWeatherIcon=weatherDetail2.getWeather().get(0).getIcon();
+                    currentWeatherIcon = weatherDetail2.getWeather().get(0).getIcon();
                     //dismiss progress dialog
                     progressDialog.dismiss();
                     //update weather icon
-                    WeatherIconLoader weatherIconLoader2=new WeatherIconLoader();
-                    weatherIconLoader2.execute(WEATHER_ICON_URL,currentWeatherIcon,".png");
+                    WeatherIconLoader weatherIconLoader2 = new WeatherIconLoader();
+                    weatherIconLoader2.execute(WEATHER_ICON_URL, currentWeatherIcon, ".png");
                 default:
                     break;
             }
@@ -139,8 +138,8 @@ public class WeatherDetailActivity extends Activity implements OnClickListener {
         protected BitmapDrawable doInBackground(String... strings) {
             try {
                 HttpClient httpClient = new DefaultHttpClient();
-                LogUtil.d("WeatherIconLoader",strings[0]+strings[1]+strings[2]);
-                HttpGet httpGet = new HttpGet(strings[0]+strings[1]+strings[2]);
+                LogUtil.d("WeatherIconLoader", strings[0] + strings[1] + strings[2]);
+                HttpGet httpGet = new HttpGet(strings[0] + strings[1] + strings[2]);
                 HttpResponse httpResponse = httpClient.execute(httpGet);
                 if (httpResponse.getStatusLine().getStatusCode() == 200) {
                     HttpEntity entity = httpResponse.getEntity();
@@ -181,20 +180,28 @@ public class WeatherDetailActivity extends Activity implements OnClickListener {
         homeButton.setOnClickListener(this);
         refreshButton.setOnClickListener(this);
 
-        progressDialog = new ProgressDialog(this);
-        progressDialog.setTitle("正在获取天气信息");
-        progressDialog.setMessage("请稍后");
-        progressDialog.setCancelable(true);
-        progressDialog.show();
+        Bundle bundle = new Bundle();
+        bundle = this.getIntent().getExtras();
+        LogUtil.d("WeatherDetailActivity", Boolean.toString(bundle == null));
 
         /******************************************************************************************
          1 Update UI.
          2 Change current city id, so you can refresh current place weather info without geographic info.
          3 Dismiss progress dialog.
          ******************************************************************************************/
-        Location location = getLocation();
-        updateUIOnCreate(location); //Update current city ID in handler.
-}
+        if (bundle == null) {
+            progressDialog = new ProgressDialog(this);
+            progressDialog.setTitle("正在获取天气信息");
+            progressDialog.setMessage("请稍后");
+            progressDialog.setCancelable(true);
+            progressDialog.show();
+            Location location = getLocation();
+            updateUIOnCreate(location); //Update current city ID in handler.
+        } else {
+            LogUtil.d("WeatherDetailActivity", Integer.toString(bundle.getInt("cityId")));
+            refreshUI(bundle.getInt("cityId"));
+        }
+    }
 
     @Override
     public void onClick(View view) {
@@ -205,7 +212,7 @@ public class WeatherDetailActivity extends Activity implements OnClickListener {
                 //tempWriteDatabase();
                 break;
             case R.id.home:
-                Intent intent = new Intent(WeatherDetailActivity.this,CitySelectionActivity.class);
+                Intent intent = new Intent(WeatherDetailActivity.this, CitySelectionActivity.class);
                 startActivity(intent);
                 break;
             default:
