@@ -12,8 +12,16 @@
             android:id="@+id/inputCity"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="9"
-            android:hint="Input your city name." />
+            android:layout_weight="8"
+            android:hint="Input your city name."
+            android:imeOptions="actionSearch"
+            android:singleLine="true" />
+
+        <Button
+            android:id="@+id/search"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" />
 
         <Button
             android:id="@+id/settings"
@@ -21,16 +29,8 @@
             android:layout_height="wrap_content"
             android:layout_weight="1" />
     </LinearLayout>
-
-    <ListView
-        android:id="@+id/queriedCityList"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_below="@+id/linearLayout2"
-        android:visibility="gone" />
     <!--End of Title-->
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
