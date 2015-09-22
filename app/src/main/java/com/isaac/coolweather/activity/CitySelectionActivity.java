@@ -7,8 +7,10 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -16,15 +18,16 @@ import com.isaac.coolweather.R;
 import com.isaac.coolweather.adapter.SavedCityDetailAdapter;
 import com.isaac.coolweather.db.CoolWeatherDBOpenHelper;
 import com.isaac.coolweather.model.SavedCityDetail;
+import com.isaac.coolweather.util.LogUtil;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class CitySelectionActivity extends Activity {
     EditText inputCity;
-    Button search;
-    Button settings;
-    ListView savedCityList;
+    ImageButton search;
+    ImageButton settings;
+    ListView savedCityListView;
 
     private List<SavedCityDetail> savedCityDetailList = new ArrayList<SavedCityDetail>();
 
@@ -34,14 +37,22 @@ public class CitySelectionActivity extends Activity {
         setContentView(R.layout.activity_city_selection);
 
         inputCity = (EditText) findViewById(R.id.inputCity);
-        settings = (Button) findViewById(R.id.settings);
-        savedCityList = (ListView) findViewById(R.id.savedCityList);
-        search = (Button) findViewById(R.id.search);
+        settings = (ImageButton) findViewById(R.id.settings);
+        savedCityListView = (ListView) findViewById(R.id.savedCityList);
+        search = (ImageButton) findViewById(R.id.search);
 
         initSavedCityDetailList();
 
         SavedCityDetailAdapter adapter = new SavedCityDetailAdapter(this, R.layout.saved_city_item, savedCityDetailList);
-        savedCityList.setAdapter(adapter);
+        savedCityListView.setAdapter(adapter);
+
+        savedCityListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                SavedCityDetail clickedItem = savedCityDetailList.get(i);
+                LogUtil.d("CitySelectionActivity","You clicked "+i+", "+clickedItem.getCityName());
+            }
+        });
 
         search.setOnClickListener(new OnClickListener() {
             @Override
@@ -51,9 +62,8 @@ public class CitySelectionActivity extends Activity {
                     Intent intent = new Intent(CitySelectionActivity.this, ChooseCityDialogActivity.class);
                     intent.putExtra("matchStr", matchStr);
                     startActivity(intent);
-                }
-                else{
-                    Toast.makeText(getApplicationContext(),"Search text cannot be empty.",Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(getApplicationContext(), "Search text cannot be empty.", Toast.LENGTH_SHORT).show();
                 }
             }
         });

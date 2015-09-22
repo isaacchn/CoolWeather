@@ -1,6 +1,7 @@
 package com.isaac.coolweather.activity;
 
 import android.app.Activity;
+import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -66,7 +67,16 @@ public class ChooseCityDialogActivity extends Activity {
 //                builder.append("insert into saved_city_detail (city_id,city_name,country,lon,lat) values (");
 //                builder.append("'")
                 Cursor cursor = db.rawQuery("select city_id from saved_city_detail where city_id=?", new String[]{Integer.toString(clickedCityItem.getId())});
-                LogUtil.d("ChooseCityDialogActivity",Integer.toString(cursor.getCount()));
+                //LogUtil.d("ChooseCityDialogActivity",Integer.toString(cursor.getCount()));
+                if(cursor.getCount()==0){//city not stored
+                    ContentValues values=new ContentValues();
+                    values.put("city_id",clickedCityItem.getId());
+                    values.put("city_name",clickedCityItem.getName());
+                    values.put("country",clickedCityItem.getCountry());
+                    values.put("lon",clickedCityItem.getCoord().getLon());
+                    values.put("lat",clickedCityItem.getCoord().getLat());
+                    db.insert("saved_city_detail",null,values);
+                }
                 Intent intent1 = new Intent(ChooseCityDialogActivity.this, WeatherDetailActivity.class);
                 Bundle bundle = new Bundle();
                 bundle.putInt("cityId", clickedCityItem.getId());
