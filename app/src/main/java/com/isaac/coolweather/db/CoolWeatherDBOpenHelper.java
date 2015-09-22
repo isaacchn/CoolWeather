@@ -11,7 +11,7 @@ import android.database.sqlite.SQLiteOpenHelper;
  * Created by IsaacCn on 2015/8/30.
  */
 public class CoolWeatherDBOpenHelper extends SQLiteOpenHelper {
-    private static final String CREATE_CITY_INFO =
+    private static final String CREATE_SAVED_CITY_INFO =
             "create table if not exists saved_city_detail ("
                     + "city_id integer primary key,"
                     + "city_name text,"
@@ -25,7 +25,7 @@ public class CoolWeatherDBOpenHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
-        sqLiteDatabase.execSQL(CREATE_CITY_INFO);
+        sqLiteDatabase.execSQL(CREATE_SAVED_CITY_INFO);
     }
 
     @Override

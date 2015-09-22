@@ -182,7 +182,7 @@ public class WeatherDetailActivity extends Activity implements OnClickListener {
 
         Bundle bundle = new Bundle();
         bundle = this.getIntent().getExtras();
-        LogUtil.d("WeatherDetailActivity", Boolean.toString(bundle == null));
+        //LogUtil.d("WeatherDetailActivity", Boolean.toString(bundle == null));
 
         /******************************************************************************************
          1 Update UI.
@@ -190,6 +190,7 @@ public class WeatherDetailActivity extends Activity implements OnClickListener {
          3 Dismiss progress dialog.
          ******************************************************************************************/
         if (bundle == null) {
+            LogUtil.d("WeatherDetailActivity", "Bundle is null.");
             progressDialog = new ProgressDialog(this);
             progressDialog.setTitle("正在获取天气信息");
             progressDialog.setMessage("请稍后");
