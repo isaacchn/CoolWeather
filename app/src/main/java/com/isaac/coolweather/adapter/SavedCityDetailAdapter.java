@@ -1,6 +1,7 @@
 package com.isaac.coolweather.adapter;
 
 import android.content.Context;
+import android.database.sqlite.SQLiteDatabase;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,6 +10,8 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.isaac.coolweather.R;
+import com.isaac.coolweather.application.MyApplication;
+import com.isaac.coolweather.db.CoolWeatherDBOpenHelper;
 import com.isaac.coolweather.model.SavedCityDetail;
 import com.isaac.coolweather.util.LogUtil;
 
@@ -29,8 +32,8 @@ public class SavedCityDetailAdapter extends ArrayAdapter<SavedCityDetail> {
 
     @Override
     public View getView(final int position, final View convertView, ViewGroup parent) {
-        LogUtil.d("SavedCityDetailAdapter","getView()被调用");
-        SavedCityDetail cityDetail = getItem(position);
+        //LogUtil.d("SavedCityDetailAdapter","getView()被调用");
+        final SavedCityDetail cityDetail = getItem(position);
         View view = LayoutInflater.from(getContext()).inflate(resourceId, null);
         TextView listItemCityName = (TextView) view.findViewById(R.id.listItemCityName);
         TextView listItemCountry = (TextView) view.findViewById(R.id.listItemCountry);
@@ -42,8 +45,13 @@ public class SavedCityDetailAdapter extends ArrayAdapter<SavedCityDetail> {
             @Override
             public void onClick(View view) {
                 adapterDataList.remove(position);
-                LogUtil.d("SavedCityDetailAdapter","onClick() --- remove "+position);
+                LogUtil.d("SavedCityDetailAdapter", "onClick() --- remove " + position);
                 notifyDataSetChanged();;
+                CoolWeatherDBOpenHelper dbOpenHelper=new CoolWeatherDBOpenHelper(MyApplication.getContext(),"OpenWeather.db",null,1);
+                SQLiteDatabase db = dbOpenHelper.getWritableDatabase();
+                db.delete("saved_city_detail","city_id=?",new String[]{Integer.toString(cityDetail.getCityId())});
+                db.close();
+                dbOpenHelper.close();
             }
         });
         return view;

@@ -205,6 +205,13 @@ public class WeatherDetailActivity extends Activity implements OnClickListener {
     }
 
     @Override
+    public void onBackPressed() {
+        LogUtil.d("WeatherDetailActivity","onBackPressed");
+        this.finish();
+        android.os.Process.killProcess(android.os.Process.myPid());
+    }
+
+    @Override
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.refresh:

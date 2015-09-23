@@ -83,5 +83,7 @@ public class CitySelectionActivity extends Activity {
                 savedCityDetailList.add(new SavedCityDetail(city_id, city_name, country, longitude, latitude));
             }
         }
+        db.close();
+        dbOpenHelper.close();
     }
 }
