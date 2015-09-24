@@ -38,7 +38,13 @@
 
     </RelativeLayout>
     <!--End of Title-->
-
+    <TextView
+        android:id="@+id/updateTimeTextView"
+        android:layout_width="fill_parent"
+        android:layout_height="30dp"
+        android:gravity="center_vertical|right"
+        android:background="#1C86EE"
+        android:textColor="#FFFFFF"/>
     <!--Main-->
     <RelativeLayout
         android:layout_width="match_parent"

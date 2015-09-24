@@ -7,26 +7,28 @@
         android:id="@+id/listItemCityName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="30sp"/>
+        android:textSize="30sp" />
+
     <TextView
         android:id="@+id/listItemSymbol"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="30sp"
         android:layout_toRightOf="@id/listItemCityName"
-        android:text=","/>
+        android:text=","
+        android:textSize="30sp" />
+
     <TextView
         android:id="@+id/listItemCountry"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="30sp"
-        android:layout_toRightOf="@id/listItemSymbol"/>
+        android:layout_toRightOf="@id/listItemSymbol"
+        android:textSize="30sp" />
 
     <Button
         android:id="@+id/listItemDelete"
         android:layout_width="30dp"
         android:layout_height="30dp"
-        android:background="@android:drawable/ic_delete"
         android:layout_alignParentRight="true"
-        />
+        android:background="@android:drawable/ic_delete"
+        android:focusable="false" />
 </RelativeLayout>

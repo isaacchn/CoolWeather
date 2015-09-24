@@ -33,8 +33,11 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.w3c.dom.Text;
 
 import java.io.InputStream;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 public class WeatherDetailActivity extends Activity implements OnClickListener {
@@ -45,6 +48,7 @@ public class WeatherDetailActivity extends Activity implements OnClickListener {
     ImageView weatherImage;
     TextView weatherMain;
     TextView weatherDetail;
+    TextView updateTimeTextView;
     ProgressDialog progressDialog;
     ProgressBar iconProgressBar;
 
@@ -84,6 +88,10 @@ public class WeatherDetailActivity extends Activity implements OnClickListener {
                     //update currentCityId & currentWeatherIcon
                     currentCityId = weatherDetailObj.getId();
                     currentWeatherIcon = weatherDetailObj.getWeather().get(0).getIcon();
+                    //update update_time
+                    SimpleDateFormat formatter = new SimpleDateFormat("MM-dd HH:mm");
+                    Date curDate = new Date(System.currentTimeMillis());
+                    updateTimeTextView.setText("Updated at " + formatter.format(curDate));
                     //dismiss progress dialog
                     progressDialog.dismiss();
                     //update weather icon
@@ -112,6 +120,10 @@ public class WeatherDetailActivity extends Activity implements OnClickListener {
                     //update currentCityId & currentWeatherIcon
                     currentCityId = weatherDetail2.getId();
                     currentWeatherIcon = weatherDetail2.getWeather().get(0).getIcon();
+                    //update update_time
+                    SimpleDateFormat formatter2 = new SimpleDateFormat("MM-dd HH:mm");
+                    Date curDate2 = new Date(System.currentTimeMillis());
+                    updateTimeTextView.setText("Updated at " + formatter2.format(curDate2));
                     //dismiss progress dialog
                     progressDialog.dismiss();
                     //update weather icon
@@ -175,6 +187,7 @@ public class WeatherDetailActivity extends Activity implements OnClickListener {
         weatherImage = (ImageView) findViewById(R.id.weather_image);
         weatherMain = (TextView) findViewById(R.id.weather_main);
         weatherDetail = (TextView) findViewById(R.id.weather_detail);
+        updateTimeTextView = (TextView) findViewById(R.id.updateTimeTextView);
         iconProgressBar = (ProgressBar) findViewById(R.id.weather_icon_progress);
 
         homeButton.setOnClickListener(this);
@@ -206,7 +219,7 @@ public class WeatherDetailActivity extends Activity implements OnClickListener {
 
     @Override
     public void onBackPressed() {
-        LogUtil.d("WeatherDetailActivity","onBackPressed");
+        LogUtil.d("WeatherDetailActivity", "onBackPressed");
         this.finish();
         android.os.Process.killProcess(android.os.Process.myPid());
     }
@@ -257,8 +270,12 @@ public class WeatherDetailActivity extends Activity implements OnClickListener {
 
     //Update user interface when activity created
     private void updateUIOnCreate(Location location) {
-        double longitude = location.getLongitude();
-        double latitude = location.getLatitude();
+        /*
+        * double longitude = location.getLongitude();
+            double latitude = location.getLatitude();
+        * */
+        double longitude = 117.2785382d;    //用模拟器测试
+        double latitude = 35.6654702d;
         LogUtil.d("WeatherDetailActivity", "Location: " + longitude + "," + latitude);
         Utilities.updateWeatherInfoByLocation(this, longitude, latitude, new UpdateUIListener() {
             @Override
@@ -296,6 +313,7 @@ public class WeatherDetailActivity extends Activity implements OnClickListener {
         Location location = locationManager.getLastKnownLocation(locationProvider);
         return location;
     }
+
 
 //    private void tempWritePreferences(){
 //        SharedPreferences.Editor editor=getSharedPreferences("savedCityList",MODE_PRIVATE).edit();

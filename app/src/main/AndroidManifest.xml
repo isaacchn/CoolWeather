@@ -14,18 +14,23 @@
         <activity
             android:name=".activity.WeatherDetailActivity"
             android:label="@string/title_activity_weather_detail">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
         <activity
             android:name=".activity.CitySelectionActivity"
-            android:label="@string/title_activity_city_selection"></activity>
+            android:label="@string/title_activity_city_selection" />
         <activity
             android:name=".activity.ChooseCityDialogActivity"
             android:label="@string/title_activity_choose_city_dialog"
-            android:theme="@android:style/Theme.Dialog"></activity>
+            android:theme="@android:style/Theme.Dialog" />
+        <activity
+            android:name=".activity.SettingActivity"
+            android:label="@string/title_activity_setting">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
     </application>
 
 </manifest>

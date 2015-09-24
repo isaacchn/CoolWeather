@@ -8,7 +8,6 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.AdapterView;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
@@ -51,6 +50,11 @@ public class CitySelectionActivity extends Activity {
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 SavedCityDetail clickedItem = savedCityDetailList.get(i);
                 LogUtil.d("CitySelectionActivity","You clicked "+i+", "+clickedItem.getCityName());
+                Intent intent=new Intent(CitySelectionActivity.this,WeatherDetailActivity.class);
+                Bundle bundle=new Bundle();
+                bundle.putInt("cityId",clickedItem.getCityId());
+                intent.putExtras(bundle);
+                startActivity(intent);
             }
         });
 

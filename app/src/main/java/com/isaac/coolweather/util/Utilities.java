@@ -1,6 +1,10 @@
 package com.isaac.coolweather.util;
 
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
+
+import com.isaac.coolweather.application.MyApplication;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -120,5 +124,31 @@ public class Utilities {
                 }
             }
         }).start();
+    }
+
+    public static boolean getAutoUpdateFlag() {
+        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(MyApplication.getContext());
+        boolean autoUpdateFlag = pref.getBoolean("AutoUpdateFlag", true);
+        return autoUpdateFlag;
+    }
+
+    public static int getAutoUpdateInterval() {
+        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(MyApplication.getContext());
+        int autoUpdateInterval = pref.getInt("AutoUpdateInterval", 2);
+        return autoUpdateInterval;
+    }
+
+    public static void setAutoUpdateFlag(boolean flag) {
+        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(MyApplication.getContext());
+        SharedPreferences.Editor editor = pref.edit();
+        editor.putBoolean("AutoUpdateFlag", flag);
+        editor.commit();
+    }
+
+    public static void setAutoUpdateInterval(int interval) {
+        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(MyApplication.getContext());
+        SharedPreferences.Editor editor = pref.edit();
+        editor.putInt("AutoUpdateInterval", interval);
+        editor.commit();
     }
 }
