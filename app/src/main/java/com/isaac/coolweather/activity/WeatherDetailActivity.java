@@ -95,7 +95,7 @@ public class WeatherDetailActivity extends Activity implements OnClickListener {
                     currentCityId = weatherDetailObj.getId();
                     currentWeatherIcon = weatherDetailObj.getWeather().get(0).getIcon();
                     //update update_time
-                    SimpleDateFormat formatter = new SimpleDateFormat("MM-dd HH:mm");
+                    SimpleDateFormat formatter = new SimpleDateFormat("MM-dd HH:mm:ss");
                     Date curDate = new Date(System.currentTimeMillis());
                     updateTimeTextView.setText("Updated at " + formatter.format(curDate));
                     //dismiss progress dialog
@@ -127,7 +127,7 @@ public class WeatherDetailActivity extends Activity implements OnClickListener {
                     currentCityId = weatherDetail2.getId();
                     currentWeatherIcon = weatherDetail2.getWeather().get(0).getIcon();
                     //update update_time
-                    SimpleDateFormat formatter2 = new SimpleDateFormat("MM-dd HH:mm");
+                    SimpleDateFormat formatter2 = new SimpleDateFormat("MM-dd HH:mm:ss");
                     Date curDate2 = new Date(System.currentTimeMillis());
                     updateTimeTextView.setText("Updated at " + formatter2.format(curDate2));
                     //dismiss progress dialog
@@ -188,7 +188,7 @@ public class WeatherDetailActivity extends Activity implements OnClickListener {
     class LocalReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
-            LogUtil.d("LocalReceiver", "received!!!");
+            LogUtil.d("LocalReceiver", "本地广播获取，更新UI");
             refreshUI(currentCityId);
         }
     }
@@ -234,10 +234,14 @@ public class WeatherDetailActivity extends Activity implements OnClickListener {
         }
 
         if (Utilities.getAutoUpdateFlag()) {        //读取配置文件，初始化设置。
+            LogUtil.d("WeatherDetailActivity", "读取配置文件完毕，需要自动更新。");
             Intent intent = new Intent(this, AutoUpdateService.class);
             int autoUpdateInterval = Utilities.getAutoUpdateInterval();
             intent.putExtra("AUTO_UPDATE_INTERVAL", autoUpdateInterval);
+            LogUtil.d("WeatherDetailActivity", "自动更新每" + autoUpdateInterval + "分钟");
             startService(intent);
+        } else {
+            LogUtil.d("WeatherDetailActivity", "读取配置文件完毕，不需要自动更新。");
         }
 
         IntentFilter intentFilter = new IntentFilter();

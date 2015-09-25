@@ -38,11 +38,11 @@ public class AutoUpdateService extends Service {
         LogUtil.d("AutoUpdateService", "onStartCommand at " + new Date().toString());
         AlarmManager manager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
         int minutes = intent.getIntExtra("AUTO_UPDATE_INTERVAL", 2);
-        LogUtil.d("AutoUpdateService", "Auto update every " + minutes + " minutes.");
+        LogUtil.d("AutoUpdateService", "自动更新每 " + minutes + " 分钟.");
         final long INTERVAL = 60000 * minutes;
         long triggerAtTime = SystemClock.elapsedRealtime() + INTERVAL;
-        Intent i = new Intent(this, AlarmReceiver.class);
-        PendingIntent pi = PendingIntent.getBroadcast(this, 0, i, 0);
+        Intent i = new Intent(getApplicationContext(), AlarmReceiver.class);
+        PendingIntent pi = PendingIntent.getBroadcast(getApplicationContext(), 0, i, 0);
         manager.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, triggerAtTime, pi);
 
         //LogUtil.d("AutoUpdateService",Boolean.toString(intent.getBooleanExtra("calledByAlarmFlag",false)));

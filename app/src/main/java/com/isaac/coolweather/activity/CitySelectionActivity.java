@@ -49,10 +49,10 @@ public class CitySelectionActivity extends Activity {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 SavedCityDetail clickedItem = savedCityDetailList.get(i);
-                LogUtil.d("CitySelectionActivity","You clicked "+i+", "+clickedItem.getCityName());
-                Intent intent=new Intent(CitySelectionActivity.this,WeatherDetailActivity.class);
-                Bundle bundle=new Bundle();
-                bundle.putInt("cityId",clickedItem.getCityId());
+                LogUtil.d("CitySelectionActivity", "You clicked " + i + ", " + clickedItem.getCityName());
+                Intent intent = new Intent(CitySelectionActivity.this, WeatherDetailActivity.class);
+                Bundle bundle = new Bundle();
+                bundle.putInt("cityId", clickedItem.getCityId());
                 intent.putExtras(bundle);
                 startActivity(intent);
             }
@@ -69,6 +69,13 @@ public class CitySelectionActivity extends Activity {
                 } else {
                     Toast.makeText(getApplicationContext(), "Search text cannot be empty.", Toast.LENGTH_SHORT).show();
                 }
+            }
+        });
+        settings.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(CitySelectionActivity.this, SettingActivity.class);
+                startActivity(intent);
             }
         });
     }

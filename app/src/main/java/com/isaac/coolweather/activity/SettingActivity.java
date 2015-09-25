@@ -1,6 +1,9 @@
 package com.isaac.coolweather.activity;
 
 import android.app.Activity;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -13,6 +16,8 @@ import android.widget.Switch;
 import android.widget.Toast;
 
 import com.isaac.coolweather.R;
+import com.isaac.coolweather.receiver.AlarmReceiver;
+import com.isaac.coolweather.service.AutoUpdateService;
 import com.isaac.coolweather.util.LogUtil;
 import com.isaac.coolweather.util.Utilities;
 
@@ -24,12 +29,18 @@ public class SettingActivity extends Activity {
     Spinner spinnerAutoUpdateInterval;
     ImageButton buttonSaveSettings;
 
+    boolean originalAutoUpdateFlag;
+    int originalAutoUpdateInterval;
+
     private ArrayAdapter spinnerAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_setting);
+
+        originalAutoUpdateFlag = Utilities.getAutoUpdateFlag();
+        originalAutoUpdateInterval = Utilities.getAutoUpdateInterval();
 
         buttonSettingsGoHome = (Button) findViewById(R.id.settings_home);
         buttonSettingsGoBack = (Button) findViewById(R.id.settings_back);
@@ -125,12 +136,33 @@ public class SettingActivity extends Activity {
                             Utilities.setAutoUpdateInterval(2);
                             break;
                     }
-                }
-                else
-                {
+                } else {
                     Utilities.setAutoUpdateFlag(false);
                 }
-                Toast.makeText(SettingActivity.this,"Settings saved.",Toast.LENGTH_SHORT).show();
+
+                //更新AutoUpdateService
+                boolean currentAutoUpdateFlag = Utilities.getAutoUpdateFlag();
+                int currentAutoUpdateInterval = Utilities.getAutoUpdateInterval();
+                if ((originalAutoUpdateFlag != currentAutoUpdateFlag) || (originalAutoUpdateInterval != currentAutoUpdateInterval)) {//设置发生改变
+                    LogUtil.d("SettingActivity", "设置发生改变!");
+                    if (!currentAutoUpdateFlag) {//自动更新关闭
+                        LogUtil.d("SettingActivity", "自动更新关闭!");
+                        Intent intent = new Intent(SettingActivity.this, AutoUpdateService.class);
+                        stopService(intent);
+                        AlarmManager manager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+                        Intent i = new Intent(getApplicationContext(), AlarmReceiver.class);
+                        PendingIntent pi = PendingIntent.getBroadcast(getApplicationContext(), 0, i, 0);
+                        manager.cancel(pi);
+                        LogUtil.d("SettingActivity","AlarmManager关闭");
+                    } else {
+                        LogUtil.d("SettingActivity", "自动更新开启!");
+                        Intent intent = new Intent(SettingActivity.this, AutoUpdateService.class);
+                        intent.putExtra("AUTO_UPDATE_INTERVAL", currentAutoUpdateInterval);
+                        startService(intent);
+                    }
+                }
+
+                Toast.makeText(SettingActivity.this, "Settings saved.", Toast.LENGTH_SHORT).show();
                 finish();
             }
         });

@@ -15,7 +15,7 @@ import java.util.Date;
 public class AlarmReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
-        LogUtil.d("AlarmReceiver", "onReceive at " + new Date().toString());
+        LogUtil.d("AlarmReceiver", "onReceive at " + new Date().toString()+", "+context.toString());
         Intent i = new Intent(context, AutoUpdateService.class);
         i.putExtra("calledByAlarmFlag",true);
         context.startService(i);
