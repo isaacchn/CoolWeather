@@ -14,6 +14,11 @@
         <activity
             android:name=".activity.WeatherDetailActivity"
             android:label="@string/title_activity_weather_detail">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
         </activity>
         <activity
             android:name=".activity.CitySelectionActivity"
@@ -24,13 +29,10 @@
             android:theme="@android:style/Theme.Dialog" />
         <activity
             android:name=".activity.SettingActivity"
-            android:label="@string/title_activity_setting">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
+            android:label="@string/title_activity_setting"></activity>
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
+        <service android:name=".service.AutoUpdateService" />
+        <receiver android:name=".receiver.AlarmReceiver" />
     </application>
 
 </manifest>

@@ -131,6 +131,7 @@ public class SettingActivity extends Activity {
                     Utilities.setAutoUpdateFlag(false);
                 }
                 Toast.makeText(SettingActivity.this,"Settings saved.",Toast.LENGTH_SHORT).show();
+                finish();
             }
         });
     }

@@ -2,8 +2,10 @@ package com.isaac.coolweather.activity;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
@@ -13,6 +15,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.v4.content.LocalBroadcastManager;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -24,6 +27,7 @@ import android.widget.Toast;
 import com.google.gson.Gson;
 import com.isaac.coolweather.R;
 import com.isaac.coolweather.model.WeatherDetail;
+import com.isaac.coolweather.service.AutoUpdateService;
 import com.isaac.coolweather.util.LogUtil;
 import com.isaac.coolweather.util.UpdateUIListener;
 import com.isaac.coolweather.util.Utilities;
@@ -33,7 +37,6 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.w3c.dom.Text;
 
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
@@ -54,11 +57,14 @@ public class WeatherDetailActivity extends Activity implements OnClickListener {
 
     private final static int UPDATE_ON_CREATE = 1000;
     private final static int REFRESH_CURRENT_CITY = 1001;
+    private final static int SERVICE_UPDATE = 1002;
     private static final String CURRENT_WEATHER_URL = "http://api.openweathermap.org/data/2.5/weather?id=";
     private static final String WEATHER_ICON_URL = "http://openweathermap.org/img/w/";  //eg:http://openweathermap.org/img/w/09d.png
     //public static final double KELVIN_ZERO_DEGREE = 273.15;
 
     private LocationManager locationManager;
+    private LocalBroadcastManager localBroadcastManager;
+    private LocalReceiver localReceiver;
     private String locationProvider;
     private int currentCityId;
     private String currentWeatherIcon;
@@ -129,6 +135,9 @@ public class WeatherDetailActivity extends Activity implements OnClickListener {
                     //update weather icon
                     WeatherIconLoader weatherIconLoader2 = new WeatherIconLoader();
                     weatherIconLoader2.execute(WEATHER_ICON_URL, currentWeatherIcon, ".png");
+                    break;
+                case SERVICE_UPDATE:
+                    LogUtil.d("WeatherDetailActivity", "SERVICE_UPDATE");
                 default:
                     break;
             }
@@ -176,6 +185,14 @@ public class WeatherDetailActivity extends Activity implements OnClickListener {
         }
     }
 
+    class LocalReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            LogUtil.d("LocalReceiver", "received!!!");
+            refreshUI(currentCityId);
+        }
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -215,13 +232,36 @@ public class WeatherDetailActivity extends Activity implements OnClickListener {
             LogUtil.d("WeatherDetailActivity", Integer.toString(bundle.getInt("cityId")));
             refreshUI(bundle.getInt("cityId"));
         }
+
+        if (Utilities.getAutoUpdateFlag()) {        //读取配置文件，初始化设置。
+            Intent intent = new Intent(this, AutoUpdateService.class);
+            int autoUpdateInterval = Utilities.getAutoUpdateInterval();
+            intent.putExtra("AUTO_UPDATE_INTERVAL", autoUpdateInterval);
+            startService(intent);
+        }
+
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction("com.isaac.coolweather.UPDATE_UI_BROADCAST");
+        localReceiver = new LocalReceiver();
+        localBroadcastManager = LocalBroadcastManager.getInstance(this);
+        localBroadcastManager.registerReceiver(localReceiver, intentFilter);
     }
 
     @Override
     public void onBackPressed() {
         LogUtil.d("WeatherDetailActivity", "onBackPressed");
+        Intent intent = new Intent(this, AutoUpdateService.class);
+        stopService(intent);
         this.finish();
         android.os.Process.killProcess(android.os.Process.myPid());
+    }
+
+    @Override
+    protected void onDestroy() {
+        LogUtil.d("WeatherDetailActivity", "onDestroy()");
+        Intent intent = new Intent(this, AutoUpdateService.class);
+        stopService(intent);
+        super.onDestroy();
     }
 
     @Override
@@ -274,8 +314,8 @@ public class WeatherDetailActivity extends Activity implements OnClickListener {
         * double longitude = location.getLongitude();
             double latitude = location.getLatitude();
         * */
-        double longitude = 117.2785382d;    //用模拟器测试
-        double latitude = 35.6654702d;
+        double longitude = 133.949997;    //用模拟器测试
+        double latitude = 34.25;
         LogUtil.d("WeatherDetailActivity", "Location: " + longitude + "," + latitude);
         Utilities.updateWeatherInfoByLocation(this, longitude, latitude, new UpdateUIListener() {
             @Override
@@ -313,21 +353,4 @@ public class WeatherDetailActivity extends Activity implements OnClickListener {
         Location location = locationManager.getLastKnownLocation(locationProvider);
         return location;
     }
-
-
-//    private void tempWritePreferences(){
-//        SharedPreferences.Editor editor=getSharedPreferences("savedCityList",MODE_PRIVATE).edit();
-//        editor.putInt("cityId",12345);
-//        editor.putString("cityName","Utuobang");
-//        editor.putString("country","Earth");
-//        editor.putFloat("longitude",12.11f);
-//        editor.putFloat("latitude",11.12f);
-//        editor.apply();
-//    }
-//    private void tempWriteDatabase(){
-//        CoolWeatherDBOpenHelper openHelper = new CoolWeatherDBOpenHelper(this,"OpenWeather.db",null,1);
-//        SQLiteDatabase db = openHelper.getWritableDatabase();
-//        //db.execSQL("insert into saved_city_detail (city_id,city_name,country,lon,lat) values ('12345,'Sishui','CN','11.22','22.11');");
-//        //db.execSQL("insert into saved_city_detail (city_id,city_name,country,lon,lat) values ('12346,'Jining','CN','33.22','22.11');");
-//    }
 }
